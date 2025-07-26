@@ -1,0 +1,29 @@
+mod config;
+mod database;
+mod logger;
+
+use axum::{Router, debug_handler, routing};
+use tokio::net::TcpListener;
+
+#[tokio::main]
+async fn main() {
+    // 日志初始化
+    logger::init();
+
+    //路由配置
+    let router = Router::new().route("/", routing::get(index));
+
+    let port: u16 = config::get().server.port();
+    // 监听配置
+    let bind_add: String = format!("0.0.0.0:{port}");
+    let listener: TcpListener = TcpListener::bind(&bind_add).await.unwrap();
+
+    tracing::info!("Listener bind {bind_add}");
+
+    axum::serve(listener, router).await.unwrap()
+}
+
+#[debug_handler]
+async fn index() -> &'static str {
+    "hello rust!"
+}
