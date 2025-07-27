@@ -1,12 +1,12 @@
+mod app;
 mod config;
 mod database;
 mod entity;
 mod logger;
+mod server;
 
 use anyhow::Ok;
 use axum::{Router, debug_handler, extract::State, response::IntoResponse, routing};
-use entity::prelude::*;
-use entity::*;
 use sea_orm::prelude::*;
 use tokio::net::TcpListener;
 
@@ -33,19 +33,4 @@ async fn main() -> anyhow::Result<()> {
 
     axum::serve(listener, router).await.unwrap();
     Ok(())
-}
-
-#[debug_handler]
-async fn index() -> &'static str {
-    "hello rust!"
-}
-
-#[debug_handler]
-async fn find_user(State(db): State<DatabaseConnection>) -> impl IntoResponse {
-    let users = User::find()
-        .filter(user::Column::Name.eq("123123"))
-        .all(&db)
-        .await
-        .unwrap();
-    axum::Json(users)
 }
