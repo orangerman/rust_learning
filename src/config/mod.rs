@@ -1,18 +1,21 @@
+mod database;
 mod server;
 
-use std::{sync::LazyLock, thread::LocalKey};
+use std::sync::LazyLock;
 
 use anyhow::Context;
 use config::Config;
+pub use database::DataBaseConfig;
 use serde::Deserialize;
 pub use server::ServerConifg;
 
 static CONFIG: LazyLock<AppConfig> =
-     LazyLock::new(|| AppConfig::load().expect("failed to init config"));
+    LazyLock::new(|| AppConfig::load().expect("failed to init config"));
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
-    pub server: ServerConifg,
+    server: ServerConifg,
+    database: DataBaseConfig,
 }
 impl AppConfig {
     pub fn load() -> anyhow::Result<Self> {
@@ -34,9 +37,16 @@ impl AppConfig {
             .try_deserialize()
             .with_context(|| anyhow::anyhow!("Failed to deserialize config"))
     }
+
+    pub fn server(&self) -> &ServerConifg {
+        &self.server
+    }
+
+    pub fn database(&self) -> &DataBaseConfig {
+        &self.database
+    }
 }
 
-
-pub fn get() -> &'static AppConfig{
- &CONFIG
+pub fn get() -> &'static AppConfig {
+    &CONFIG
 }
