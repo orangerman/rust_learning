@@ -19,7 +19,7 @@ pub async fn init() -> anyhow::Result<DatabaseConnection> {
     ));
 
     options
-        .min_connections(2)
+        .min_connections(10)
         .max_connections(50)
         .connect_timeout(Duration::from_secs(10))
         .acquire_timeout(Duration::from_secs(10))

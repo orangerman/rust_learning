@@ -15,7 +15,7 @@ async fn main() -> anyhow::Result<()> {
     database::init().await?;
 
     //路由配置
-    let router = Router::new().route("/", routing::get(index));
+    let router: Router = Router::new().route("/", routing::get(index));
 
     let port: u16 = config::get().server().port();
     // 监听配置
