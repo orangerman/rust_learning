@@ -1,24 +1,26 @@
+use crate::app::AppState;
 use crate::config::*;
 use crate::database;
+use crate::entity::*;
 use anyhow::Ok;
-use axum::Router;
-use sea_orm::{Database, DatabaseConnection};
+use axum::ServiceExt;
+use axum::{Router, debug_handler, extract::State, response::IntoResponse, routing};
+use sea_orm::DatabaseConnection;
+use sea_orm::prelude::*;
+use std::net::SocketAddr;
 use tokio::net::TcpListener;
-use tokio::net::unix::SocketAddr;
 
-pub struct server {
+pub struct Server {
     pub config: &'static ServerConifg,
 }
 
-impl server {
+impl Server {
     pub fn new(config: &'static ServerConifg) -> Self {
         Self { config }
     }
 
-    pub async fn start(&self) -> anyhow::Result<()> {
-        let db = database::init().await?;
-
-        let router = self.build_router(db);
+    pub async fn start(&self, state: AppState, router: Router<AppState>) -> anyhow::Result<()> {
+        let router: Router = self.build_router(state, router);
         let port: u16 = self.config.port();
         // 监听配置
         let bind_addr: String = format!("127.0.0.1:{port}");
@@ -32,11 +34,7 @@ impl server {
         Ok(())
     }
 
-    pub fn build_router(&self, db: DatabaseConnection) -> Router {
-        // Router::new()
-        //     .route("/", routing::get(index))
-        //     .route("/users", routing::get(find_user))
-        //     .with_state(db)
-        todo!()
+    fn build_router(&self, state: AppState, router: Router<AppState>) -> Router {
+        Router::new().merge(router).with_state(state)
     }
 }
