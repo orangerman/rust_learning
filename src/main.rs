@@ -1,5 +1,6 @@
 mod config;
 mod database;
+mod entity;
 mod logger;
 
 use anyhow::Ok;
