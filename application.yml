@@ -1,2 +1,8 @@
 server:
   port: 3001
+database:
+  port: 3306
+  username: root
+  password: root
+  host: 192.168.31.220
+  database: javafan
